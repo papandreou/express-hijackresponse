@@ -1,0 +1,16 @@
+{
+    "author": "Andreas Lind Petersen <andreas@one.com>",
+    "name": "express-hijackresponse",
+    "description": "Rewrite HTTP responses on their way out.",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/papandreou/express-hijackresponse.git"
+    },
+    "main": "lib/index.js",
+    "engines": {
+        "node": ">= 0.4.0"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}
