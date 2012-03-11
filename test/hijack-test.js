@@ -65,5 +65,28 @@ vows.describe('').addBatch({
         'should return a 500': function (err, res, body) {
             assert.equal(res.statusCode, 500);
         }
+    },
+    'Create a test server that hijacks the response and immediately unhijacks it, then run a request against it': {
+        topic: function () {
+            var appInfo = runTestServer(
+                express.createServer()
+                    .use(function (req, res, next) {
+                        res.hijack(function (err, res) {
+                            res.unhijack(true);
+                        });
+                        next();
+                    })
+                    .use(function (req, res, next) {
+                        res.send("foo");
+                    })
+                    .use(express.errorHandler())
+            );
+            request({
+                url: appInfo.url
+            }, this.callback);
+        },
+        'should return "foo"': function (err, res, body) {
+            assert.equal(body, 'foo');
+        }
     }
 })['export'](module);
