@@ -18,7 +18,7 @@ function runTestServer(app) {
     };
 };
 
-vows.describe('').addBatch({
+vows.describe('res.hijack').addBatch({
     'Create a test server that pipes the hijacked response into itself, then do a request against it': {
         topic: function () {
             var appInfo = runTestServer(
