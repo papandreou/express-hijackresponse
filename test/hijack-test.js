@@ -88,5 +88,79 @@ vows.describe('').addBatch({
         'should return "foo"': function (err, res, body) {
             assert.equal(body, 'foo');
         }
+    },
+    'Create a test server that pauses the original response after each emitted "data" event, then run a request against it': {
+        topic: function () {
+            var events = [];
+            var appInfo = runTestServer(
+                express.createServer()
+                    .use(function (req, res, next) {
+                        events.push("hijack");
+                        var isPaused = false;
+                        res.hijack(function (err, res) {
+                            res.on('data', function (chunk) {
+                                events.push(chunk);
+                                if (!isPaused) {
+                                    isPaused = true;
+                                    events.push('pause');
+                                    res.pause();
+                                    setTimeout(function () {
+                                        events.push('resume');
+                                        res.resume();
+                                        isPaused = false;
+                                    }, 2);
+                                }
+                            }).on('end', function () {
+                                events.push('end');
+                                res.send({events: events});
+                            });
+                        });
+                        next();
+                    })
+                    .use(function (req, res, next) {
+                        var num = 0;
+                        (function proceed() {
+                            if (num < 3) {
+                                num += 1;
+                                var isPaused = !res.write('foo' + num);
+                                if (isPaused) {
+                                    res.once('drain', function () {
+                                        events.push('drain');
+                                        proceed();
+                                    });
+                                } else {
+                                    process.nextTick(proceed);
+                                }
+                            } else {
+                                res.end();
+                            }
+                        }());
+                    })
+                    .use(express.errorHandler())
+            );
+            request({
+                url: appInfo.url
+            }, this.callback);
+        },
+        'should return "foo"': function (err, res, body) {
+            assert.equal(res.headers['content-type'], 'application/json; charset=utf-8');
+            assert.deepEqual(JSON.parse(body).events,
+                             [
+                                 'hijack',
+                                 'foo1',
+                                 'pause',
+                                 'resume',
+                                 'drain',
+                                 'foo2',
+                                 'pause',
+                                 'resume',
+                                 'drain',
+                                 'foo3',
+                                 'pause',
+                                 'resume',
+                                 'drain',
+                                 'end'
+                             ]);
+        }
     }
 })['export'](module);
