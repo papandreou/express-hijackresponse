@@ -41,6 +41,31 @@ vows.describe('res.hijack').addBatch({
             assert.equal(body, 'foo');
         }
     },
+    'Create a test server that pipes the original response through a buffered stream, then do a request against it': {
+        topic: function () {
+            var appInfo = runTestServer(
+                express.createServer()
+                    .use(function (req, res, next) {
+                        res.hijack(function (err, res) {
+                            var bufferedStream = new (require('bufferedstream'))();
+                            res.pipe(bufferedStream);
+                            bufferedStream.pipe(res);
+                        });
+                        next();
+                    })
+                    .use(function (req, res, next) {
+                          res.send("foo");
+                    })
+            );
+            var req = request({
+                url: appInfo.url,
+                encoding: null
+            }, this.callback);
+        },
+        'should return the expected response': function (err, res, body) {
+            assert.equal(body, 'foo');
+        }
+    },
     'Create a test server that hijacks the response and passes an error to next(), then run a request against it': {
         topic: function () {
             var appInfo = runTestServer(

@@ -13,6 +13,7 @@
     },
     "dependencies": {},
     "devDependencies": {
+        "bufferedstream": "= 1.0.1",
         "express": "= 2.5.8",
         "request": "= 2.9.153",
         "vows": "= 0.6.2"
