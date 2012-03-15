@@ -19,7 +19,7 @@ function runTestServer(app) {
 };
 
 vows.describe('res.hijack').addBatch({
-    'Create a test server that pipes the hijacked response into itself, then do a request against it': {
+    'Create a test server that pipes the hijacked response into itself, then do a request against it (simple variant)': {
         topic: function () {
             var appInfo = runTestServer(
                 express.createServer()
@@ -41,7 +41,38 @@ vows.describe('res.hijack').addBatch({
             assert.equal(body, 'foo');
         }
     },
-    'Create a test server that pipes the original response through a buffered stream, then do a request against it': {
+    'Create a test server that pipes the hijacked response into itself, then do a request against it (streming variant)': {
+        topic: function () {
+            var appInfo = runTestServer(
+                express.createServer()
+                    .use(function (req, res, next) {
+                        res.hijack(function (err, res) {
+                            res.pipe(res);
+                        });
+                        next();
+                    })
+                    .use(function (req, res, next) {
+                        var num = 0;
+                        (function proceed() {
+                            if (num < 5) {
+                                res.write('foo');
+                                num += 1;
+                                process.nextTick(proceed);
+                            } else {
+                                res.end('bar');
+                            }
+                        }());
+                    })
+            );
+            request({
+                url: appInfo.url
+            }, this.callback);
+        },
+        'should return "foo"': function (err, res, body) {
+            assert.equal(body, 'foofoofoofoofoobar');
+        }
+    },
+    'Create a test server that pipes the original response through a buffered stream, then do a request against it (simple variant)': {
         topic: function () {
             var appInfo = runTestServer(
                 express.createServer()
@@ -54,7 +85,7 @@ vows.describe('res.hijack').addBatch({
                         next();
                     })
                     .use(function (req, res, next) {
-                          res.send("foo");
+                        res.send('foo');
                     })
             );
             var req = request({
@@ -64,6 +95,33 @@ vows.describe('res.hijack').addBatch({
         },
         'should return the expected response': function (err, res, body) {
             assert.equal(body, 'foo');
+        }
+    },
+    'Create a test server that pipes the original response through a buffered stream, then do a request against it (streaming variant)': {
+        // This test fails because Stream.prototype.pipe tears down the pipe when the destination stream emits the 'end' event.
+        // Everything works if this line is commented out: https://github.com/joyent/node/blob/master/lib/stream.js#L115
+        topic: function () {
+            var appInfo = runTestServer(
+                express.createServer()
+                    .use(function (req, res, next) {
+                        res.hijack(function (err, res) {
+                            var bufferedStream = new (require('bufferedstream'))();
+                            res.pipe(bufferedStream);
+                            bufferedStream.pipe(res);
+                        });
+                        next();
+                    })
+                    .use(function (req, res, next) {
+                        res.end('bar');
+                    })
+            );
+            var req = request({
+                url: appInfo.url,
+                encoding: null
+            }, this.callback);
+        },
+        'should return the expected response': function (err, res, body) {
+            assert.equal(body, 'bar');
         }
     },
     'Create a test server that hijacks the response and passes an error to next(), then run a request against it': {
