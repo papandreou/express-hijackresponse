@@ -29,7 +29,7 @@ Requiring the module installs a `hijack` method on your response objects:
     // ...
 
     app.use(function (req, res, next) {
-        req.hijack(function (err, res) {
+        res.hijack(function (err, res) {
             if (err) {
                 res.unhijack(); // Make the original res object work again
                 return next(err);
