@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/papandreou/express-hijackresponse.png)](http://travis-ci.org/papandreou/express-hijackresponse)
 express-hijackresponse
 ======================
 
