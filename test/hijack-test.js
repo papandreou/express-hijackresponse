@@ -3,7 +3,7 @@ var vows = require('vows'),
     request = require('request'),
     assert = require('assert');
 
-require('../lib');
+require('../lib/hijackResponse');
 
 function runTestServer(app) {
     // Listen on a vacant TCP port and hand back the url + app
