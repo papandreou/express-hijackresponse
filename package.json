@@ -1,21 +1,20 @@
 {
-    "author": "Andreas Lind Petersen <andreas@one.com>",
-    "name": "express-hijackresponse",
-    "description": "Rewrite HTTP responses on their way out.",
-    "version": "0.1.2",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/papandreou/express-hijackresponse.git"
-    },
-    "main": "lib/hijackResponse.js",
-    "engines": {
-        "node": ">=0.4.0"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "bufferedstream": "=1.0.1",
-        "express": "=2.5.11",
-        "request": "=2.9.153",
-        "vows": "=0.6.2"
-    }
+  "author": "Andreas Lind Petersen <andreas@one.com>",
+  "name": "express-hijackresponse",
+  "description": "Rewrite HTTP responses on their way out.",
+  "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/papandreou/express-hijackresponse.git"
+  },
+  "main": "lib/hijackResponse.js",
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "devDependencies": {
+    "bufferedstream": "=1.0.1",
+    "express": "=2.5.11",
+    "request": "=2.9.153",
+    "vows": "=0.6.2"
+  }
 }
