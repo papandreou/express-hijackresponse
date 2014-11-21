@@ -11,8 +11,12 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "scripts": {
+    "test": "vows"
+  },
   "devDependencies": {
     "bufferedstream": "=1.0.1",
+    "errorhandler": "^1.2.2",
     "express": "4.8.8",
     "request": "=2.9.153",
     "vows": "0.7.0"
