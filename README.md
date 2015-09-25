@@ -1,3 +1,10 @@
+Deprecation notice
+==================
+
+PLEASE DON'T USE THIS MODULE. It doesn't support streams2+ properly, is bug-ridden
+and unmaintained. Please use https://github.com/gustavnikolaj/hijackresponse instead.
+It has the same feature set and works :)
+
 express-hijackresponse
 ======================
 
